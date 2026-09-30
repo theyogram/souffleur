@@ -1,0 +1,41 @@
+{
+  "script": "Astra ouvre cette discussion avec une question simple. Pourquoi certaines idées restent dans notre mémoire tandis que d'autres disparaissent avant le lendemain ? La réponse commence par une histoire concrète, racontée avec des détails précis. Un matin, Camille traverse la ville pour retrouver son ancienne équipe et comprend enfin ce qui avait changé.\n\nFable reprend ensuite le récit dans un atelier lumineux. Plusieurs collègues observent une maquette fragile, discutent du calendrier et cherchent une solution robuste. Leur première tentative échoue, mais une nouvelle proposition transforme le problème. Personne ne promet un miracle : chacun vérifie les chiffres, écoute les objections et avance calmement.\n\nZéphyr présente maintenant une expérience différente. Pendant trois semaines, le groupe rencontre des habitants, collecte leurs remarques et modifie le projet. Les résultats surprennent tout le monde. Une contrainte oubliée devient un avantage évident, et la prochaine étape paraît enfin possible. Cette conclusion montre pourquoi la patience compte davantage que les effets spectaculaires.",
+  "events": [
+    {
+      "time": 0,
+      "kind": "final",
+      "text": "Astra ouvre cette discussion",
+      "expected": 3
+    },
+    {
+      "time": 1,
+      "kind": "volatile",
+      "text": "La réponse commence par une histoire concrète",
+      "expected": 28
+    },
+    {
+      "time": 1.4,
+      "kind": "final",
+      "text": "La réponse commence par une histoire concrète",
+      "expected": 28
+    },
+    {
+      "time": 2,
+      "kind": "volatile",
+      "text": "racontée avec des détails précis",
+      "expected": 33
+    },
+    {
+      "time": 2.4,
+      "kind": "final",
+      "text": "racontée avec des détails précis",
+      "expected": 33
+    },
+    {
+      "time": 3,
+      "kind": "volatile",
+      "text": "Un matin Camille traverse la ville",
+      "expected": 39
+    }
+  ]
+}
