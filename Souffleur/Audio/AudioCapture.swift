@@ -10,6 +10,7 @@ final class AudioCapture {
     private var engine: AVAudioEngine?
     private var continuation: AsyncStream<AVAudioPCMBuffer>.Continuation?
     private var deviceToken: AnyObject?
+    private var configurationToken: NSObjectProtocol?
     private var selectedUID: String?
     private var lastLevelTime = Date.distantPast
 
@@ -75,6 +76,14 @@ final class AudioCapture {
         do {
             try newEngine.start()
             engine = newEngine
+            configurationToken = NotificationCenter.default.addObserver(
+                forName: .AVAudioEngineConfigurationChange, object: newEngine, queue: nil
+            ) { [weak self, weak newEngine] _ in
+                guard let self, let newEngine else { return }
+                self.queue.async { [weak self] in
+                    self?.handleConfigurationChangeLocked(for: newEngine)
+                }
+            }
         } catch {
             input.removeTap(onBus: 0)
             throw error
@@ -84,9 +93,7 @@ final class AudioCapture {
     private func handleDeviceChangeLocked() {
         guard let selectedUID, engine != nil,
               !AudioDevices.inputDevices().contains(where: { $0.id == selectedUID }) else { return }
-        engine?.inputNode.removeTap(onBus: 0)
-        engine?.stop()
-        engine = nil
+        stopEngineLocked()
         self.selectedUID = nil
         do {
             try startEngineLocked()
@@ -96,13 +103,32 @@ final class AudioCapture {
         }
     }
 
-    private func stopLocked() {
-        deviceToken = nil
+    private func handleConfigurationChangeLocked(for changedEngine: AVAudioEngine) {
+        guard selectedUID == nil, engine === changedEngine else { return }
+        stopEngineLocked()
+        do {
+            try startEngineLocked()
+            DispatchQueue.main.async { [weak self] in self?.onDeviceLost?() }
+        } catch {
+            stopLocked()
+        }
+    }
+
+    private func stopEngineLocked() {
+        if let configurationToken {
+            NotificationCenter.default.removeObserver(configurationToken)
+            self.configurationToken = nil
+        }
         if let engine {
             engine.inputNode.removeTap(onBus: 0)
             engine.stop()
             self.engine = nil
         }
+    }
+
+    private func stopLocked() {
+        deviceToken = nil
+        stopEngineLocked()
         continuation?.finish()
         continuation = nil
         selectedUID = nil

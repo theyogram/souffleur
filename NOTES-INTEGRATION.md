@@ -15,9 +15,15 @@
 - Propriété en plus du protocole : `AppleSpeechEngine.onError: ((SpeechEngineError) -> Void)?`, appelée HORS main thread → la brancher (redémarrage auto ≤ 3, §7.11) en repassant sur le main actor.
 - `TranscriptUpdate.timestamp` = temps audio (début d'analyse + position) ; pour la latence de l'overlay debug, mesurer `Date()` à la réception.
 - `AudioCapture.onLevel` / `onDeviceLost` sont appelés sur le main thread.
-- ⚠️ À CORRIGER : avec l'entrée « défaut système » (UID vide), un changement du périphérique par défaut arrête AVAudioEngine sans relance. Observer `.AVAudioEngineConfigurationChange` dans AudioCapture et redémarrer le moteur sur le nouveau défaut (continuation conservée), puis appeler onDeviceLost.
+- Corrigé : `AudioCapture` observe `.AVAudioEngineConfigurationChange`, recrée le moteur sur la nouvelle entrée par défaut en conservant la continuation audio, puis appelle `onDeviceLost`.
 - Validation manuelle requise : transcription micro réelle (`-speechSmokeTest`), débranchement, latence.
 
 ## prompter (commit 901e1f4, 5/5 tests)
 - Aucun écart d'API. NSGlassEffectView, panneau non activant, CADisplayLink via view.displayLink.
 - `PrompterDemo.show()` à brancher sur `-prompterDemo` ; capture visuelle de la démo non encore faite.
+
+## integration
+- `PlaybackController` relie les modes, le suivi, la bibliothèque, les réglages et la fenêtre. Recommencer anime maintenant le retour au début pendant l'écoute.
+- `make test DERIVED=build/integration` : 41 tests passés, 0 échec. `make build DERIVED=build/integration` : succès. L'app lancée depuis le build affiche la fenêtre prompteur, la bibliothèque vide au premier lancement et l'icône de menu ; aucun crash observé dans le journal du processus.
+- À valider manuellement : transcription micro réelle et permissions, téléchargement du modèle hors ligne, changement du périphérique par défaut et débranchement du micro choisi, reprise après interruption du moteur, latence et sessions longues (§10.2 R1 à R9).
+- À valider manuellement : mode Constant avec un script long, focus de la pilule devant OBS et visibilité en plein écran. Le premier lancement sans script a été vérifié visuellement avec la bibliothèque ouverte.

@@ -111,7 +111,7 @@ final class PrompterWindowController: NSObject {
     func setCursor(wordIndex: Int, animated: Bool) {
         cursor = min(max(wordIndex, -1), textView.tokens.count - 1)
         textView.updateSpokenIndex(cursor)
-        recalculate(animated: animated && (state.isRunning || cursor != 0) && cursor >= 0)
+        recalculate(animated: animated && (state.isRunning || cursor != 0))
     }
 
     func apply(_ appearance: PrompterAppearance) {
