@@ -1,0 +1,6 @@
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+.DS_Store
+Souffleur.xcodeproj/

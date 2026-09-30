@@ -1,0 +1,60 @@
+name: Souffleur
+options:
+  bundleIdPrefix: co.theyo
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    ARCHS: arm64
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    ENABLE_HARDENED_RUNTIME: NO
+    DEVELOPMENT_TEAM: ""
+targets:
+  Souffleur:
+    type: application
+    platform: macOS
+    sources:
+      - path: Souffleur
+    info:
+      path: Souffleur/Resources/Info.plist
+      properties:
+        CFBundleName: Souffleur
+        CFBundleDisplayName: Souffleur
+        CFBundleShortVersionString: "0.1.0"
+        CFBundleVersion: "1"
+        LSUIElement: true
+        LSMinimumSystemVersion: "26.0"
+        NSMicrophoneUsageDescription: "Souffleur écoute ta voix pour faire défiler le script au rythme de ta lecture. Rien ne quitte ton Mac."
+        NSSpeechRecognitionUsageDescription: "Souffleur transcrit ta voix sur l'appareil pour suivre le mot que tu prononces."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.theyo.souffleur
+        PRODUCT_NAME: Souffleur
+        GENERATE_INFOPLIST_FILE: NO
+  SouffleurTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: SouffleurTests
+    dependencies:
+      - target: Souffleur
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: co.theyo.souffleur.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Souffleur.app/Contents/MacOS/Souffleur"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+schemes:
+  Souffleur:
+    build:
+      targets:
+        Souffleur: all
+        SouffleurTests: [test]
+    test:
+      targets:
+        - SouffleurTests
