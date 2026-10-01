@@ -98,6 +98,18 @@ final class PrompterTextView: NSTextView {
         return line.offsetBy(dx: textContainerOrigin.x, dy: textContainerOrigin.y)
     }
 
+    /// Position verticale continue d'un mot : haut de sa ligne + progression dans la ligne.
+    /// Au dernier mot d'une ligne, la valeur atteint le haut de la ligne suivante.
+    func continuousY(for index: Int) -> CGFloat? {
+        guard let line = lineRect(for: index) else { return nil }
+        var first = index
+        while first > 0, let rect = lineRect(for: first - 1), abs(rect.minY - line.minY) < 1 { first -= 1 }
+        var last = index
+        while last + 1 < tokens.count, let rect = lineRect(for: last + 1), abs(rect.minY - line.minY) < 1 { last += 1 }
+        let progress = CGFloat(index - first + 1) / CGFloat(last - first + 1)
+        return line.minY + progress * line.height
+    }
+
     func firstWordIndex(onLineAt y: CGFloat) -> Int {
         guard !tokens.isEmpty else { return -1 }
         var low = 0

@@ -10,6 +10,8 @@ struct MatcherConfig {
     var approximateSimilarity = 0.8
     var levenshteinThreshold = 0.75
     var minimumApproximateLength = 4
+    /// Longueur minimale d'un début de mot (volatil, en cours de prononciation) pour l'apparier.
+    var minimumPrefixLength = 3
     var mismatchPenalty = -0.5
     var gapPenalty = -0.4
     var unmatchedTailPenalty = -0.3

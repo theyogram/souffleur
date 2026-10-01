@@ -11,6 +11,8 @@ final class ScriptMatcher {
     private var index: [String: [Int]] = [:]
     private var similarityCache: [String: [String: Double]] = [:]
     private var similarityCacheCount = 0
+    // Vrai quand le dernier mot entendu peut être incomplet (résultat volatil).
+    private var lastHeardIsPartial = false
     private(set) var cursor = -1
     var allowBackward: Bool
     private(set) var lastDebug = MatchDebugInfo()
@@ -28,6 +30,7 @@ final class ScriptMatcher {
     @discardableResult
     func ingest(_ update: TranscriptUpdate) -> Bool {
         let heard = Tokenizer.tokenize(update.text)
+        lastHeardIsPartial = update.kind == .volatile
         switch update.kind {
         case .volatile:
             volatile = heard
@@ -137,7 +140,7 @@ final class ScriptMatcher {
                 let h = heard[row - 1]
                 for column in 1...width {
                     let s = tokens[start + column - 1]
-                    let similarity = similarity(h, s)
+                    let similarity = similarity(h, s, partial: lastHeardIsPartial && row == heard.count)
                     var diagonal = previous[column - 1]
                     diagonal.score += similarity == 0 ? config.mismatchPenalty : similarity * s.weight
                     if similarity > 0, s.weight == 1 { diagonal.strong += 1 }
@@ -169,9 +172,12 @@ final class ScriptMatcher {
         return best
     }
 
-    private func similarity(_ heard: ScriptToken, _ script: ScriptToken) -> Double {
+    private func similarity(_ heard: ScriptToken, _ script: ScriptToken, partial: Bool = false) -> Double {
         if heard.key == script.key { return config.exactSimilarity }
         if heard.stem == script.stem { return config.approximateSimilarity }
+        // Mot en cours de prononciation : son début suffit à l'apparier.
+        if partial, heard.key.count >= config.minimumPrefixLength, script.key.count > heard.key.count,
+           script.key.hasPrefix(heard.key) { return config.approximateSimilarity }
         if let cached = similarityCache[heard.key]?[script.key] { return cached }
         let a = Array(heard.key.utf16), b = Array(script.key.utf16)
         guard a.count >= config.minimumApproximateLength, b.count >= config.minimumApproximateLength else { return 0 }

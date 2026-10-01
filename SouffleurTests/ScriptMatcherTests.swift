@@ -16,6 +16,20 @@ final class ScriptMatcherTests: XCTestCase {
         XCTAssertTrue((2...4).contains(m.cursor))
     }
 
+    func testPartialVolatileWordAdvancesCursor() {
+        let m = matcher("Pas celle qui dépassera les humains capables")
+        send(m, "Pas celle qui", kind: .volatile)
+        XCTAssertEqual(m.cursor, 2)
+        send(m, "Pas celle qui dép", kind: .volatile, at: 0.2)
+        XCTAssertEqual(m.cursor, 3)
+    }
+
+    func testPartialWordIsNotMatchedInFinalResult() {
+        let m = matcher("Pas celle qui dépassera les humains capables")
+        send(m, "Pas celle qui dép")
+        XCTAssertEqual(m.cursor, 2)
+    }
+
     func testSilence() {
         let m = matcher("Astra présente une méthode")
         send(m, "Astra présente")

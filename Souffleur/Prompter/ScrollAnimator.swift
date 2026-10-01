@@ -33,7 +33,7 @@ final class ScrollAnimator: NSObject {
         let dt = min(max(link.timestamp - (lastTimestamp ?? link.timestamp), 0), 1.0 / 20)
         lastTimestamp = link.timestamp
         onStep?(dt)
-        let omega: CGFloat = 7
+        let omega: CGFloat = 12
         let step = CGFloat(dt)
         let acceleration = omega * omega * (target - position) - 2 * omega * velocity
         velocity += acceleration * step

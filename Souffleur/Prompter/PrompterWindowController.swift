@@ -231,7 +231,7 @@ final class PrompterWindowController: NSObject {
         textView.frame.size.width = scroll.contentSize.width
         let height = max(scroll.contentSize.height, textView.laidOutHeight)
         textView.frame.size.height = height
-        let lineY = cursor >= 0 ? (textView.lineRect(for: cursor)?.minY ?? 0) : 0
+        let lineY = cursor >= 0 ? (textView.continuousY(for: cursor) ?? 0) : 0
         let target = PrompterLayout.targetY(lineY: lineY, visibleHeight: scroll.contentSize.height, contentHeight: height, readingLine: CGFloat(appearance.readingLine))
         if animated {
             animator.target = target
