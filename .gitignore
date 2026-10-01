@@ -4,3 +4,4 @@ DerivedData/
 *.xcodeproj/project.xcworkspace/xcuserdata/
 .DS_Store
 Souffleur.xcodeproj/
+signing/
