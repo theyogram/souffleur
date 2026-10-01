@@ -7,13 +7,19 @@ final class PrompterTextView: NSTextView {
     private var script = ""
     private var prompterAppearance = PrompterAppearance()
     private var spokenIndex = -1
+    // Le layout manager ne retient pas le stockage : on le garde vivant ici.
+    private let backingStorage: NSTextStorage
 
+    // TextKit 1 : mise en page complète et stable du document, nécessaire pour mesurer
+    // chaque ligne. L'ensureLayout global de TextKit 2 levait NSInvalidArgumentException
+    // au premier chargement d'un long script, ce qui interrompait l'ouverture du prompteur.
     init() {
-        let storage = NSTextContentStorage()
-        let manager = NSTextLayoutManager()
+        let storage = NSTextStorage()
+        let layout = NSLayoutManager()
         let container = NSTextContainer(size: NSSize(width: 560, height: CGFloat.greatestFiniteMagnitude))
-        storage.addTextLayoutManager(manager)
-        manager.textContainer = container
+        storage.addLayoutManager(layout)
+        layout.addTextContainer(container)
+        backingStorage = storage
         super.init(frame: .zero, textContainer: container)
     }
 
@@ -81,25 +87,15 @@ final class PrompterTextView: NSTextView {
 
     func lineRect(for index: Int) -> CGRect? {
         guard tokens.indices.contains(index),
-              let manager = textLayoutManager,
-              let storage = manager.textContentManager else { return nil }
+              let layout = layoutManager,
+              let container = textContainer else { return nil }
         let offset = tokens[index].range.location
-        guard offset >= 0, offset < (script as NSString).length,
-              let location = storage.location(storage.documentRange.location, offsetBy: offset) else { return nil }
-        guard let textRange = NSTextRange(location: location, end: location) else { return nil }
-        manager.ensureLayout(for: textRange)
-        guard let fragment = manager.textLayoutFragment(for: location) else { return nil }
-        let fragmentStart = storage.offset(from: storage.documentRange.location, to: fragment.rangeInElement.location)
-        for line in fragment.textLineFragments {
-            let range = NSRange(location: fragmentStart + line.characterRange.location, length: line.characterRange.length)
-            if NSLocationInRange(offset, range) || (offset == NSMaxRange(range) && line === fragment.textLineFragments.last) {
-                return CGRect(x: textContainerOrigin.x + fragment.layoutFragmentFrame.minX + line.typographicBounds.minX,
-                              y: textContainerOrigin.y + fragment.layoutFragmentFrame.minY + line.typographicBounds.minY,
-                              width: line.typographicBounds.width,
-                              height: line.typographicBounds.height)
-            }
-        }
-        return nil
+        guard offset >= 0, offset < (script as NSString).length else { return nil }
+        layout.ensureLayout(for: container)
+        let glyph = layout.glyphIndexForCharacter(at: offset)
+        guard glyph < layout.numberOfGlyphs else { return nil }
+        let line = layout.lineFragmentUsedRect(forGlyphAt: glyph, effectiveRange: nil)
+        return line.offsetBy(dx: textContainerOrigin.x, dy: textContainerOrigin.y)
     }
 
     func firstWordIndex(onLineAt y: CGFloat) -> Int {
@@ -126,9 +122,9 @@ final class PrompterTextView: NSTextView {
     }
 
     var laidOutHeight: CGFloat {
-        guard let manager = textLayoutManager, let range = manager.textContentManager?.documentRange else { return bounds.height }
-        manager.ensureLayout(for: range)
-        return manager.usageBoundsForTextContainer.height + textContainerOrigin.y * 2
+        guard let layout = layoutManager, let container = textContainer else { return bounds.height }
+        layout.ensureLayout(for: container)
+        return layout.usedRect(for: container).height + textContainerOrigin.y * 2
     }
 }
 
