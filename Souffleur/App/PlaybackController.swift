@@ -18,7 +18,7 @@ import Observation
     @ObservationIgnored private var driver = ScrollDriver(mode: .voice, speed: 40, thresholdDb: -45)
     @ObservationIgnored private var sourceTokens: [ScriptToken] = []
     @ObservationIgnored private var displayedTokens: [ScriptToken] = []
-    @ObservationIgnored private var displayedText = ""
+    @ObservationIgnored private(set) var displayedText = ""
     @ObservationIgnored private var levelDb = -160.0
     @ObservationIgnored private var lastLatencyMs = 0.0
     @ObservationIgnored private var debugVisible = false
@@ -73,9 +73,11 @@ import Observation
         if state.isRunning || isPreparing { pause() }
         currentScriptID = id
         selectedScriptID = id
+        // Avant toute écriture dans UserDefaults : la notification de changement est
+        // synchrone, et settingsChanged rouvrirait le script en boucle si cet état était périmé.
+        activeRemoveEmptyLines = defaults.bool(forKey: SettingsKeys.removeEmptyLines)
         defaults.set(id.uuidString, forKey: SettingsKeys.lastScriptID)
         sourceTokens = Tokenizer.tokenize(script.body)
-        activeRemoveEmptyLines = defaults.bool(forKey: SettingsKeys.removeEmptyLines)
         displayedText = activeRemoveEmptyLines
             ? ScriptStore.removingEmptyLines(script.body) : script.body
         displayedTokens = Tokenizer.tokenize(displayedText)

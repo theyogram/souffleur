@@ -53,6 +53,16 @@ final class PlaybackControllerTests: XCTestCase {
         XCTAssertEqual(store.script(id: script.id)?.lastCharOffset, tokens[2].range.location)
     }
 
+    func testOpeningScriptKeepsBlankLinesWithoutReopeningLoop() throws {
+        let (controller, store, defaults, directory) = try makeController()
+        defer { controller.close(); clean(directory) }
+        let body = "alpha beta\n\ncharlie delta"
+        let script = store.create(body: body)
+        controller.openScript(id: script.id)
+        XCTAssertEqual(controller.displayedText, body)
+        XCTAssertEqual(defaults.string(forKey: SettingsKeys.lastScriptID), script.id.uuidString)
+    }
+
     func testEditedScriptRemapsToNearestWord() throws {
         let (controller, store, _, directory) = try makeController()
         defer { controller.close(); clean(directory) }
