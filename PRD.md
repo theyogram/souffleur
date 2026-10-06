@@ -273,7 +273,7 @@ Le raccourci ⌥⌘D affiche en bas de la fenêtre, en petit : la queue entendue
 | F-E2 | Titre = première ligne non vide, tronquée à 80 caractères (pas de champ titre séparé). |
 | F-E3 | Actions : **Nouveau** (⌘N), **Nouveau depuis le presse-papier** (⇧⌘V), **Supprimer** (avec confirmation), **Ouvrir dans le prompteur** (⌘↩). |
 | F-E4 | Sauvegarde automatique 800 ms après la dernière frappe, et à la fermeture. Aucun bouton Enregistrer. |
-| F-E5 | Option « Supprimer les lignes vides » (défaut : activée) appliquée **à l'ouverture dans le prompteur**. Le texte stocké n'est pas modifié. |
+| F-E5 | Option « Supprimer les lignes vides » (défaut : désactivée, les sauts de ligne du script sont conservés) appliquée **à l'ouverture dans le prompteur**. Le texte stocké n'est pas modifié. |
 | F-E6 | Retour au prompteur après une édition : le curseur est conservé grâce au décalage en caractères du mot courant, remappé sur le nouveau texte (mot le plus proche). |
 | F-E7 | Glisser-déposer d'un fichier `.txt` ou `.md` dans la liste : crée un script. |
 | F-E8 | Police de l'éditeur : SF Mono 14 pt, compteur de mots et durée estimée (à 150 mots par minute) en bas. |
@@ -299,7 +299,7 @@ Une fenêtre `Settings` SwiftUI avec 3 onglets : **Général**, **Défilement**,
 | `audioInputUID` | Défilement | String? | nil (= défaut système) | UID CoreAudio |
 | `allowBackward` (P1) | Défilement | Bool | false | |
 | `speechEngine` (P1) | Défilement | enum | `apple` | apple, parakeet |
-| `removeEmptyLines` | Scripts | Bool | true | |
+| `removeEmptyLines` | Scripts | Bool | false | |
 | `lastScriptID` | (interne) | UUID? | nil | |
 
 **Langue automatique** : `NLLanguageRecognizer` sur le script, puis choix de la locale prise en charge la plus proche de la région système. Exemple : français détecté, région BE, `fr-BE` non pris en charge, donc `fr-FR`. L'interface affiche « Automatique (français (France)) ».

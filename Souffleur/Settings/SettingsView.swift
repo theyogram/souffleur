@@ -22,7 +22,7 @@ struct SettingsView: View {
     @AppStorage(SettingsKeys.recognitionLocale) private var recognitionLocale = ""
     @AppStorage(SettingsKeys.audioInputUID) private var audioInputUID = ""
     @AppStorage(SettingsKeys.allowBackward) private var allowBackward = false
-    @AppStorage(SettingsKeys.removeEmptyLines) private var removeEmptyLines = true
+    @AppStorage(SettingsKeys.removeEmptyLines) private var removeEmptyLines = false
 
     init(inputDevices: @escaping () -> [(uid: String, name: String)], locales: @escaping () async -> [(identifier: String, name: String)]) {
         self.inputDevices = inputDevices

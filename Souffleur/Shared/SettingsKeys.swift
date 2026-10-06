@@ -34,7 +34,7 @@ enum SettingsKeys {
         recognitionLocale: "",
         audioInputUID: "",
         allowBackward: false,
-        removeEmptyLines: true,
+        removeEmptyLines: false,
         lastScriptID: "",
     ]
 

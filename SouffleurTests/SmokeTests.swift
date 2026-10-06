@@ -6,4 +6,8 @@ final class SmokeTests: XCTestCase {
         SettingsKeys.register()
         XCTAssertEqual(SettingsKeys.currentAppearance().fontSize, 32)
     }
+
+    func testLineBreaksAreKeptByDefault() {
+        XCTAssertEqual(SettingsKeys.defaults[SettingsKeys.removeEmptyLines] as? Bool, false)
+    }
 }
